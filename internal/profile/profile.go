@@ -72,19 +72,13 @@ func Upgrade(profile string, names []string, refresh bool) error {
 }
 
 func FormatEntries(entries []Entry) string {
-	var lines []string
-	for _, e := range entries {
-		lines = append(lines, fmt.Sprintf("%-20s  priority=%-4d  %s", e.Name, e.Priority, e.OriginalURL))
-	}
-	if len(lines) == 0 {
+	if len(entries) == 0 {
 		return "(empty profile)"
 	}
 	var b strings.Builder
-	for i, l := range lines {
-		if i > 0 {
-			b.WriteString("\n")
-		}
-		b.WriteString(l)
+	fmt.Fprintf(&b, "%-20s  %-12s  %s\n", "NAME", "PRIORITY", "SOURCE")
+	for _, e := range entries {
+		fmt.Fprintf(&b, "%-20s  %-12d  %s\n", e.Name, e.Priority, e.OriginalURL)
 	}
 	return b.String()
 }

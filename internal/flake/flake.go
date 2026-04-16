@@ -140,7 +140,11 @@ func InputsToJSON(inputs []InputInfo) (string, error) {
 }
 
 func FormatInputs(inputs []InputInfo) string {
-	var lines []string
+	if len(inputs) == 0 {
+		return "(no inputs)"
+	}
+	var b strings.Builder
+	fmt.Fprintf(&b, "%-20s  %-40s  %-12s  %s\n", "INPUT", "SOURCE", "REV", "UPDATED")
 	for _, inp := range inputs {
 		lastUpdated := ""
 		if !inp.LastModTime.IsZero() {
@@ -150,17 +154,7 @@ func FormatInputs(inputs []InputInfo) string {
 		if len(rev) > 12 {
 			rev = rev[:12]
 		}
-		lines = append(lines, fmt.Sprintf("%-20s  %-40s  %-12s  %s", inp.Name, inp.Original, rev, lastUpdated))
-	}
-	if len(lines) == 0 {
-		return "(no inputs)"
-	}
-	var b strings.Builder
-	for i, l := range lines {
-		if i > 0 {
-			b.WriteString("\n")
-		}
-		b.WriteString(l)
+		fmt.Fprintf(&b, "%-20s  %-40s  %-12s  %s\n", inp.Name, inp.Original, rev, lastUpdated)
 	}
 	return b.String()
 }
