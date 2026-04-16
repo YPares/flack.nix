@@ -15,7 +15,11 @@ type Selectable struct {
 func MultiSelect(title string, items []Selectable) ([]string, error) {
 	options := make([]huh.Option[string], len(items))
 	for i, item := range items {
-		options[i] = huh.NewOption(item.Label, item.ID)
+		opt := huh.NewOption(item.Label, item.ID)
+		if item.Enabled {
+			opt = opt.Selected(true)
+		}
+		options[i] = opt
 	}
 
 	var selected []string
@@ -25,10 +29,23 @@ func MultiSelect(title string, items []Selectable) ([]string, error) {
 		Value(&selected)
 
 	err := huh.NewForm(huh.NewGroup(field)).
-		WithTheme(huh.ThemeBase16()).
+		WithTheme(flackTheme()).
 		Run()
 	if err != nil {
 		return nil, fmt.Errorf("selection cancelled: %w", err)
 	}
 	return selected, nil
+}
+
+func flackTheme() *huh.Theme {
+	t := huh.ThemeBase16()
+
+	t.Focused.UnselectedOption = t.Focused.UnselectedOption.UnsetForeground()
+	t.Focused.UnselectedPrefix = t.Focused.UnselectedPrefix.UnsetForeground()
+	t.Focused.Option = t.Focused.Option.UnsetForeground()
+
+	t.Blurred.UnselectedOption = t.Blurred.UnselectedOption.UnsetForeground()
+	t.Blurred.UnselectedPrefix = t.Blurred.UnselectedPrefix.UnsetForeground()
+
+	return t
 }
