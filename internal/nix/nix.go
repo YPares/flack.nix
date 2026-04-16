@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -34,6 +35,16 @@ func runNix(args ...string) (string, error) {
 	return stdout.String(), nil
 }
 
+func runNixPassthrough(args ...string) error {
+	cmd := exec.Command("nix", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("nix %s: %w", strings.Join(args, " "), err)
+	}
+	return nil
+}
+
 func ProfileListJSON(profile string) (*ProfileList, error) {
 	args := []string{"profile", "list", "--profile", profile, "--json"}
 	out, err := runNix(args...)
@@ -48,13 +59,11 @@ func ProfileListJSON(profile string) (*ProfileList, error) {
 }
 
 func ProfileAdd(profile, ref string, priority int) error {
-	_, err := runNix("profile", "add", "--profile", profile, ref, "--priority", fmt.Sprintf("%d", priority))
-	return err
+	return runNixPassthrough("profile", "add", "--profile", profile, ref, "--priority", fmt.Sprintf("%d", priority))
 }
 
 func ProfileRemove(profile, name string) error {
-	_, err := runNix("profile", "remove", "--profile", profile, name)
-	return err
+	return runNixPassthrough("profile", "remove", "--profile", profile, name)
 }
 
 func ProfileUpgrade(profile string, names []string, refresh bool) error {
@@ -63,8 +72,7 @@ func ProfileUpgrade(profile string, names []string, refresh bool) error {
 		args = append(args, "--refresh")
 	}
 	args = append(args, names...)
-	_, err := runNix(args...)
-	return err
+	return runNixPassthrough(args...)
 }
 
 type LockNode struct {
@@ -117,6 +125,5 @@ func FlakeUpdate(flake string, inputs []string, refresh bool) error {
 		args = append(args, "--refresh")
 	}
 	args = append(args, inputs...)
-	_, err := runNix(args...)
-	return err
+	return runNixPassthrough(args...)
 }
