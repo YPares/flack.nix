@@ -4,11 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
-	"strings"
 
-	"github.com/olekukonko/tablewriter"
-	tw "github.com/olekukonko/tablewriter/tw"
-
+	"github.com/YPares/flack/internal/display"
 	"github.com/YPares/flack/internal/nix"
 )
 
@@ -78,20 +75,11 @@ func FormatEntries(entries []Entry) string {
 	if len(entries) == 0 {
 		return "(empty profile)"
 	}
-	var b strings.Builder
-	t := tablewriter.NewTable(&b,
-		tablewriter.WithHeader([]string{"NAME", "PRIORITY", "LOCKED"}),
-		tablewriter.WithRendition(tw.Rendition{
-			Borders:  tw.BorderNone,
-			Symbols:  tw.NewSymbols(tw.StyleNone),
-			Settings: tw.Settings{Separators: tw.SeparatorsNone, Lines: tw.LinesNone},
-		}),
-	)
+	t := display.NewTable([]string{"NAME", "PRIORITY", "LOCKED"})
 	for _, e := range entries {
-		t.Append(e.Name, fmt.Sprintf("%d", e.Priority), e.URL)
+		t.Row(e.Name, fmt.Sprintf("%d", e.Priority), e.URL)
 	}
-	t.Render()
-	return b.String()
+	return t.Render()
 }
 
 type EntryJSON struct {

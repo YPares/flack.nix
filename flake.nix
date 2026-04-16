@@ -20,7 +20,7 @@
             pname = "flack";
             version = "0.1.0";
             src = ./.;
-            vendorHash = "sha256-efDJq5gmBYDgE8TqW+o4a6I0H/zCsluUuO0v4zxAA2E=";
+            vendorHash = "sha256-YD34MpMdSNCcSfU+s0ZxsBtGReDL0/OQLPrp4QfTgDE=";
           };
           default = flack;
         }
