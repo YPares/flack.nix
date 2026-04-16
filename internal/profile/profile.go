@@ -76,9 +76,9 @@ func FormatEntries(entries []Entry) string {
 		return "(empty profile)"
 	}
 	var b strings.Builder
-	fmt.Fprintf(&b, "%-20s  %-12s  %s\n", "NAME", "PRIORITY", "SOURCE")
+	fmt.Fprintf(&b, "%-20s  %-12s  %s\n", "NAME", "PRIORITY", "LOCKED")
 	for _, e := range entries {
-		fmt.Fprintf(&b, "%-20s  %-12d  %s\n", e.Name, e.Priority, e.OriginalURL)
+		fmt.Fprintf(&b, "%-20s  %-12d  %s\n", e.Name, e.Priority, e.URL)
 	}
 	return b.String()
 }
