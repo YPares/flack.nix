@@ -15,13 +15,14 @@
         let
           pkgs = pkgsFor system;
         in
-        {
+        rec {
           flack = pkgs.buildGoModule {
             pname = "flack";
             version = "0.1.0";
             src = ./.;
             vendorHash = "sha256-TiOg0XL2I0KavA0s1eBVW2mmR6MZoKnnGLD6iD9iY1U=";
           };
+          default = flack;
         }
       );
 
