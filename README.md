@@ -9,13 +9,33 @@ If you install two packages which provide the same executable, the package with 
 
 _NOTE: All em dashes in the following man-made slop are man-made too, painstakingly input one by one._
 
+_NOTE2: ...the code, on the other hand, *is* vibe-coded with GLM-5.1 like there is no tomorrow._
+
+## Usage
+
+Install `flack` using `flack`:
+
+```sh
+nix run github:YPares/flack.nix -- push github:YPares/flack.nix#flack
+```
+
+then `flack` shows the current contents of your stac... I mean your profile.
+
+Then use:
+
+- `flack push <flake>#<package>` just as you would use `nix profile add`
+- `flack pop` to remove the last installed package
+- `flack inputs [--flake <path>]` to list info about a flake's inputs (full URL, revision, last update date)
+- `flack update [--flake <path>]` to interactively select which inputs of a flake to update in its lockfile
+- `flack` upgrade` to interactively select which elements of your profile to upgrade
+
 ## But doesn't it completely kill declarativity?
 
 Short answer: not _completely_.
 
 Long answer:
 
-To me, keeping the advantages of a declarative setup (i.e. one file or repository with your entire config—or possibly several different configs, one _"apply this configuration now whatever the current state"_ unique command) is not just a matter of tooling, it's a matter of _granularity_.
+To me, keeping the advantages of a declarative setup (i.e. one file or repository with your entire config — or possibly several different configs, one _"apply this configuration now whatever the current state"_ unique command) is not just a matter of tooling, it's a matter of _granularity_.
 
 If you were to manually install every single package this way, it would very much kill the benefits of declarativity indeed. However, you can use this approach to power a semi-declarative, yet semi-valuable workflow if paired with custom "environments" built via the nix function `buildEnv`, which does the aforementioned grouping.
 
