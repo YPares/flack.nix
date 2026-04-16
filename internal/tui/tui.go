@@ -24,7 +24,9 @@ func MultiSelect(title string, items []Selectable) ([]string, error) {
 		Options(options...).
 		Value(&selected)
 
-	err := huh.NewForm(huh.NewGroup(field)).Run()
+	err := huh.NewForm(huh.NewGroup(field)).
+		WithTheme(huh.ThemeBase16()).
+		Run()
 	if err != nil {
 		return nil, fmt.Errorf("selection cancelled: %w", err)
 	}
