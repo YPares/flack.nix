@@ -3,8 +3,10 @@ package cli
 import (
 	"fmt"
 	"os"
+	"slices"
 
 	"github.com/YPares/flack/internal/flake"
+	"github.com/YPares/flack/internal/nix"
 	"github.com/YPares/flack/internal/profile"
 	"github.com/YPares/flack/internal/tui"
 	"github.com/spf13/cobra"
@@ -17,6 +19,7 @@ var (
 	jsonOutput   bool
 	refreshFlag  bool
 	allFlag      bool
+	fromFlag     string
 )
 
 var rootCmd = &cobra.Command{
@@ -42,6 +45,7 @@ func init() {
 	}
 
 	pushCmd.Flags().BoolVar(&refreshFlag, "refresh", false, "pass --refresh to nix")
+	pushCmd.Flags().StringVarP(&fromFlag, "from", "f", "", "select interactively from a flake's packages")
 	rootCmd.AddCommand(pushCmd)
 
 	rootCmd.AddCommand(popCmd)
@@ -72,10 +76,38 @@ func defaultProfile() string {
 }
 
 var pushCmd = &cobra.Command{
-	Use:   "push <flake-ref>",
+	Use:   "push [<flake-ref>]",
 	Short: "Install a package with highest priority in the stack",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if fromFlag != "" {
+			if len(args) > 0 {
+				return fmt.Errorf("cannot specify both --from and a flake-ref argument")
+			}
+			names, err := nix.FlakePackageNames(fromFlag)
+			if err != nil {
+				return err
+			}
+			if len(names) == 0 {
+				return fmt.Errorf("no packages found for current system in flake %s", fromFlag)
+			}
+			slices.Sort(names)
+			items := make([]tui.Selectable, len(names))
+			for i, name := range names {
+				items[i] = tui.Selectable{
+					ID:    name,
+					Label: name,
+				}
+			}
+			selected, err := tui.SingleSelect("Select a package to push", items)
+			if err != nil {
+				return err
+			}
+			return profile.Push(profilePath, fromFlag+"#"+selected, priorityStep)
+		}
+		if len(args) == 0 {
+			return fmt.Errorf("requires a flake-ref argument or --from flag")
+		}
 		return profile.Push(profilePath, args[0], priorityStep)
 	},
 }

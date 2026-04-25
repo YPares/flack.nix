@@ -127,3 +127,16 @@ func FlakeUpdate(flake string, inputs []string, refresh bool) error {
 	args = append(args, inputs...)
 	return runNixPassthrough(args...)
 }
+
+func FlakePackageNames(flake string) ([]string, error) {
+	expr := `f: let system = builtins.currentSystem; pkgs = (f.packages or {})."${system}" or {}; legacy = (f.legacyPackages or {})."${system}" or {}; in builtins.attrNames (pkgs // legacy)`
+	out, err := runNix("eval", "--impure", "--json", flake+"#.", "--apply", expr)
+	if err != nil {
+		return nil, err
+	}
+	var names []string
+	if err := json.Unmarshal([]byte(out), &names); err != nil {
+		return nil, fmt.Errorf("parsing package names: %w", err)
+	}
+	return names, nil
+}

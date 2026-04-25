@@ -37,6 +37,27 @@ func MultiSelect(title string, items []Selectable) ([]string, error) {
 	return selected, nil
 }
 
+func SingleSelect(title string, items []Selectable) (string, error) {
+	options := make([]huh.Option[string], len(items))
+	for i, item := range items {
+		options[i] = huh.NewOption(item.Label, item.ID)
+	}
+
+	var selected string
+	field := huh.NewSelect[string]().
+		Title(title).
+		Options(options...).
+		Value(&selected)
+
+	err := huh.NewForm(huh.NewGroup(field)).
+		WithTheme(flackTheme()).
+		Run()
+	if err != nil {
+		return "", fmt.Errorf("selection cancelled: %w", err)
+	}
+	return selected, nil
+}
+
 func flackTheme() *huh.Theme {
 	t := huh.ThemeBase16()
 
