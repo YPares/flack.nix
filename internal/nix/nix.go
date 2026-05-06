@@ -45,8 +45,8 @@ func runNixPassthrough(args ...string) error {
 	return nil
 }
 
-func ProfileListJSON(profile string) (*ProfileList, error) {
-	args := []string{"profile", "list", "--profile", profile, "--json"}
+func ProfileListJSON() (*ProfileList, error) {
+	args := []string{"profile", "list", "--json"}
 	out, err := runNix(args...)
 	if err != nil {
 		return nil, err
@@ -58,16 +58,16 @@ func ProfileListJSON(profile string) (*ProfileList, error) {
 	return &list, nil
 }
 
-func ProfileAdd(profile, ref string, priority int) error {
-	return runNixPassthrough("profile", "add", "--profile", profile, ref, "--priority", fmt.Sprintf("%d", priority))
+func ProfileAdd(ref string, priority int) error {
+	return runNixPassthrough("profile", "add", ref, "--priority", fmt.Sprintf("%d", priority))
 }
 
-func ProfileRemove(profile, name string) error {
-	return runNixPassthrough("profile", "remove", "--profile", profile, name)
+func ProfileRemove(name string) error {
+	return runNixPassthrough("profile", "remove", name)
 }
 
-func ProfileUpgrade(profile string, names []string, refresh bool) error {
-	args := []string{"profile", "upgrade", "--profile", profile}
+func ProfileUpgrade(names []string, refresh bool) error {
+	args := []string{"profile", "upgrade"}
 	if refresh {
 		args = append(args, "--refresh")
 	}

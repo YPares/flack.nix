@@ -13,7 +13,6 @@ import (
 )
 
 var (
-	profilePath  string
 	flakePath    string
 	priorityStep int
 	jsonOutput   bool
@@ -30,11 +29,6 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	p := defaultProfile()
-	if v := os.Getenv("FLACK_PROFILE"); v != "" {
-		p = v
-	}
-	rootCmd.PersistentFlags().StringVarP(&profilePath, "profile", "p", p, "nix profile path ($FLACK_PROFILE)")
 	rootCmd.PersistentFlags().IntVar(&priorityStep, "priority-step", 10, "priority step between stack layers ($FLACK_PRIORITY_STEP)")
 	rootCmd.PersistentFlags().BoolVarP(&jsonOutput, "json", "j", false, "output as JSON")
 
@@ -67,14 +61,6 @@ func init() {
 	rootCmd.AddCommand(inputsCmd)
 }
 
-func defaultProfile() string {
-	home, _ := os.UserHomeDir()
-	if home != "" {
-		return home + "/.nix-profile"
-	}
-	return "/nix/var/nix/profiles/default"
-}
-
 var pushCmd = &cobra.Command{
 	Use:   "push [<flake-ref>]",
 	Short: "Install a package with highest priority in the stack",
@@ -103,12 +89,12 @@ var pushCmd = &cobra.Command{
 			if err != nil {
 				return err
 			}
-			return profile.Push(profilePath, fromFlag+"#"+selected, priorityStep)
+			return profile.Push(fromFlag+"#"+selected, priorityStep)
 		}
 		if len(args) == 0 {
 			return fmt.Errorf("requires a flake-ref argument or --from flag")
 		}
-		return profile.Push(profilePath, args[0], priorityStep)
+		return profile.Push(args[0], priorityStep)
 	},
 }
 
@@ -116,7 +102,7 @@ var popCmd = &cobra.Command{
 	Use:   "pop",
 	Short: "Remove the highest-priority package from the stack",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return profile.Pop(profilePath)
+		return profile.Pop()
 	},
 }
 
@@ -124,7 +110,7 @@ var upgradeCmd = &cobra.Command{
 	Use:   "upgrade",
 	Short: "Interactively select packages to upgrade",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		entries, err := profile.List(profilePath)
+		entries, err := profile.List()
 		if err != nil {
 			return err
 		}
@@ -136,7 +122,7 @@ var upgradeCmd = &cobra.Command{
 			for _, e := range entries {
 				names = append(names, e.Name)
 			}
-			return profile.Upgrade(profilePath, names, refreshFlag)
+			return profile.Upgrade(names, refreshFlag)
 		}
 		items := make([]tui.Selectable, len(entries))
 		for i, e := range entries {
@@ -152,7 +138,7 @@ var upgradeCmd = &cobra.Command{
 		if len(selected) == 0 {
 			return fmt.Errorf("no package selected")
 		}
-		return profile.Upgrade(profilePath, selected, refreshFlag)
+		return profile.Upgrade(selected, refreshFlag)
 	},
 }
 
@@ -214,7 +200,7 @@ var inputsCmd = &cobra.Command{
 }
 
 func runShow(cmd *cobra.Command, args []string) error {
-	entries, err := profile.List(profilePath)
+	entries, err := profile.List()
 	if err != nil {
 		return err
 	}

@@ -18,8 +18,8 @@ type Entry struct {
 	URL         string
 }
 
-func List(profile string) ([]Entry, error) {
-	pl, err := nix.ProfileListJSON(profile)
+func List() ([]Entry, error) {
+	pl, err := nix.ProfileListJSON()
 	if err != nil {
 		return nil, err
 	}
@@ -47,28 +47,28 @@ func nextPriority(entries []Entry, step int) int {
 	return entries[0].Priority - step
 }
 
-func Push(profile, ref string, step int) error {
-	entries, err := List(profile)
+func Push(ref string, step int) error {
+	entries, err := List()
 	if err != nil {
 		return err
 	}
 	prio := nextPriority(entries, step)
-	return nix.ProfileAdd(profile, ref, prio)
+	return nix.ProfileAdd(ref, prio)
 }
 
-func Pop(profile string) error {
-	entries, err := List(profile)
+func Pop() error {
+	entries, err := List()
 	if err != nil {
 		return err
 	}
 	if len(entries) == 0 {
 		return fmt.Errorf("profile is empty")
 	}
-	return nix.ProfileRemove(profile, entries[0].Name)
+	return nix.ProfileRemove(entries[0].Name)
 }
 
-func Upgrade(profile string, names []string, refresh bool) error {
-	return nix.ProfileUpgrade(profile, names, refresh)
+func Upgrade(names []string, refresh bool) error {
+	return nix.ProfileUpgrade(names, refresh)
 }
 
 func FormatEntries(entries []Entry) string {
