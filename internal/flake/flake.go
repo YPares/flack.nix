@@ -104,8 +104,8 @@ func formatLocked(l *struct {
 	return l.Type
 }
 
-func Update(flakePath string, inputs []string, refresh bool) error {
-	return nix.FlakeUpdate(flakePath, inputs, refresh)
+func Update(flakePath string, inputs []string, noRefresh bool) error {
+	return nix.FlakeUpdate(flakePath, inputs, noRefresh)
 }
 
 type InputJSON struct {

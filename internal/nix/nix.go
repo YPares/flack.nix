@@ -66,9 +66,9 @@ func ProfileRemove(name string) error {
 	return runNixPassthrough("profile", "remove", name)
 }
 
-func ProfileUpgrade(names []string, refresh bool) error {
+func ProfileUpgrade(names []string, noRefresh bool) error {
 	args := []string{"profile", "upgrade"}
-	if refresh {
+	if !noRefresh {
 		args = append(args, "--refresh")
 	}
 	args = append(args, names...)
@@ -119,9 +119,9 @@ func FlakeMetadataJSON(flake string) (*FlakeMetadata, error) {
 	return &meta, nil
 }
 
-func FlakeUpdate(flake string, inputs []string, refresh bool) error {
+func FlakeUpdate(flake string, inputs []string, noRefresh bool) error {
 	args := []string{"flake", "update", "--flake", flake}
-	if refresh {
+	if !noRefresh {
 		args = append(args, "--refresh")
 	}
 	args = append(args, inputs...)

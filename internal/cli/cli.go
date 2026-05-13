@@ -13,12 +13,12 @@ import (
 )
 
 var (
-	flakePath    string
-	priorityStep int
-	jsonOutput   bool
-	refreshFlag  bool
-	allFlag      bool
-	fromFlag     string
+	flakePath     string
+	priorityStep  int
+	jsonOutput    bool
+	noRefreshFlag bool
+	allFlag       bool
+	fromFlag      string
 )
 
 var rootCmd = &cobra.Command{
@@ -38,13 +38,12 @@ func init() {
 		}
 	}
 
-	pushCmd.Flags().BoolVar(&refreshFlag, "refresh", false, "pass --refresh to nix")
 	pushCmd.Flags().StringVarP(&fromFlag, "from", "f", "", "select interactively from a flake's packages")
 	rootCmd.AddCommand(pushCmd)
 
 	rootCmd.AddCommand(popCmd)
 
-	upgradeCmd.Flags().BoolVar(&refreshFlag, "refresh", false, "pass --refresh to nix profile upgrade")
+	upgradeCmd.Flags().BoolVar(&noRefreshFlag, "no-refresh", false, "do not pass --refresh to nix profile upgrade")
 	upgradeCmd.Flags().BoolVar(&allFlag, "all", false, "upgrade all packages without selection")
 	rootCmd.AddCommand(upgradeCmd)
 
@@ -53,7 +52,7 @@ func init() {
 		f = v
 	}
 	updateCmd.Flags().StringVarP(&flakePath, "flake", "f", f, "flake path ($FLACK_FLAKE)")
-	updateCmd.Flags().BoolVar(&refreshFlag, "refresh", false, "pass --refresh to nix flake update")
+	updateCmd.Flags().BoolVar(&noRefreshFlag, "no-refresh", false, "do not pass --refresh to nix flake update")
 	updateCmd.Flags().BoolVar(&allFlag, "all", false, "update all inputs without selection")
 	rootCmd.AddCommand(updateCmd)
 
@@ -122,7 +121,7 @@ var upgradeCmd = &cobra.Command{
 			for _, e := range entries {
 				names = append(names, e.Name)
 			}
-			return profile.Upgrade(names, refreshFlag)
+			return profile.Upgrade(names, noRefreshFlag)
 		}
 		items := make([]tui.Selectable, len(entries))
 		for i, e := range entries {
@@ -138,7 +137,7 @@ var upgradeCmd = &cobra.Command{
 		if len(selected) == 0 {
 			return fmt.Errorf("no package selected")
 		}
-		return profile.Upgrade(selected, refreshFlag)
+		return profile.Upgrade(selected, noRefreshFlag)
 	},
 }
 
@@ -158,7 +157,7 @@ var updateCmd = &cobra.Command{
 			for _, inp := range inputs {
 				names = append(names, inp.Name)
 			}
-			return flake.Update(flakePath, names, refreshFlag)
+			return flake.Update(flakePath, names, noRefreshFlag)
 		}
 		items := make([]tui.Selectable, len(inputs))
 		for i, inp := range inputs {
@@ -174,7 +173,7 @@ var updateCmd = &cobra.Command{
 		if len(selected) == 0 {
 			return fmt.Errorf("no input selected")
 		}
-		return flake.Update(flakePath, selected, refreshFlag)
+		return flake.Update(flakePath, selected, noRefreshFlag)
 	},
 }
 

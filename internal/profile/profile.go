@@ -67,8 +67,8 @@ func Pop() error {
 	return nix.ProfileRemove(entries[0].Name)
 }
 
-func Upgrade(names []string, refresh bool) error {
-	return nix.ProfileUpgrade(names, refresh)
+func Upgrade(names []string, noRefresh bool) error {
+	return nix.ProfileUpgrade(names, noRefresh)
 }
 
 func FormatEntries(entries []Entry) string {
