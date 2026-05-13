@@ -43,6 +43,9 @@ func init() {
 
 	rootCmd.AddCommand(popCmd)
 
+	rootCmd.AddCommand(moveCmd)
+	moveCmd.Flags().SetInterspersed(false)
+
 	upgradeCmd.Flags().BoolVar(&noRefreshFlag, "no-refresh", false, "do not pass --refresh to nix profile upgrade")
 	upgradeCmd.Flags().BoolVar(&allFlag, "all", false, "upgrade all packages without selection")
 	rootCmd.AddCommand(upgradeCmd)
@@ -102,6 +105,20 @@ var popCmd = &cobra.Command{
 	Short: "Remove the highest-priority package from the stack",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return profile.Pop()
+	},
+}
+
+var moveCmd = &cobra.Command{
+	Use:   "move <package> <new_priority>",
+	Short: "Move a package to a new priority level",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		name := args[0]
+		var newPriority int
+		if _, err := fmt.Sscanf(args[1], "%d", &newPriority); err != nil {
+			return fmt.Errorf("invalid priority %q: must be an integer", args[1])
+		}
+		return profile.Move(name, newPriority)
 	},
 }
 

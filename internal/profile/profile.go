@@ -71,6 +71,28 @@ func Upgrade(names []string, noRefresh bool) error {
 	return nix.ProfileUpgrade(names, noRefresh)
 }
 
+func Move(name string, newPriority int) error {
+	entries, err := List()
+	if err != nil {
+		return err
+	}
+	var target *Entry
+	for i := range entries {
+		if entries[i].Name == name {
+			target = &entries[i]
+			break
+		}
+	}
+	if target == nil {
+		return fmt.Errorf("package %q not found in profile", name)
+	}
+	ref := target.OriginalURL + "#" + target.AttrPath
+	if err := nix.ProfileRemove(name); err != nil {
+		return err
+	}
+	return nix.ProfileAdd(ref, newPriority)
+}
+
 func FormatEntries(entries []Entry) string {
 	if len(entries) == 0 {
 		return "(empty profile)"
