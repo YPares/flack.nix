@@ -7,10 +7,6 @@ This results in a coarser-grained and more manageable profile, in which you can 
 `nix profile` has a little-known feature which is that every installed package is given a **priority** value, settable at install time.
 If you install two packages which provide the same executable, the package with the lowest priority value will take precedence, and the executable from the other package will simply be hidden.
 
-_NOTE: All em dashes in the following man-made slop are man-made too, painstakingly input one by one._
-
-_NOTE2: ...the code, on the other hand, *is* vibe-coded with GLM-5.1 like there is no tomorrow._
-
 ## Usage
 
 Install `flack` using `flack`:

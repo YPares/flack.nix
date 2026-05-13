@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/YPares/flack/internal/display"
 	"github.com/YPares/flack/internal/nix"
@@ -97,9 +98,10 @@ func FormatEntries(entries []Entry) string {
 	if len(entries) == 0 {
 		return "(empty profile)"
 	}
-	t := display.NewTable([]string{"NAME", "PRIORITY", "LOCKED"})
+	t := display.NewTable([]string{"NAME", "PRIORITY", "SOURCE", "LOCKED"})
 	for _, e := range entries {
-		t.Row(e.Name, fmt.Sprintf("%d", e.Priority), e.URL)
+		source := strings.TrimPrefix(e.OriginalURL, "flake:")
+		t.Row(e.Name, fmt.Sprintf("%d", e.Priority), source, e.URL)
 	}
 	return t.Render()
 }
