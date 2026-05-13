@@ -126,8 +126,9 @@ var upgradeCmd = &cobra.Command{
 		items := make([]tui.Selectable, len(entries))
 		for i, e := range entries {
 			items[i] = tui.Selectable{
-				ID:    e.Name,
-				Label: fmt.Sprintf("%s (%s)", e.Name, e.OriginalURL),
+				ID:       e.Name,
+				Label:    fmt.Sprintf("%s (%s)", e.Name, e.OriginalURL),
+				Selected: true,
 			}
 		}
 		selected, err := tui.MultiSelect("Select packages to upgrade", items)
@@ -162,8 +163,9 @@ var updateCmd = &cobra.Command{
 		items := make([]tui.Selectable, len(inputs))
 		for i, inp := range inputs {
 			items[i] = tui.Selectable{
-				ID:    inp.Name,
-				Label: fmt.Sprintf("%s (%s)", inp.Name, inp.Original),
+				ID:       inp.Name,
+				Label:    fmt.Sprintf("%s (%s)", inp.Name, inp.Original),
+				Selected: true,
 			}
 		}
 		selected, err := tui.MultiSelect("Select inputs to update", items)

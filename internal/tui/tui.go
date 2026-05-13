@@ -7,16 +7,16 @@ import (
 )
 
 type Selectable struct {
-	ID      string
-	Label   string
-	Enabled bool
+	ID       string
+	Label    string
+	Selected bool
 }
 
 func MultiSelect(title string, items []Selectable) ([]string, error) {
 	options := make([]huh.Option[string], len(items))
 	for i, item := range items {
 		opt := huh.NewOption(item.Label, item.ID)
-		if item.Enabled {
+		if item.Selected {
 			opt = opt.Selected(true)
 		}
 		options[i] = opt
